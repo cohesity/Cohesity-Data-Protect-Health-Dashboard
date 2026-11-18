@@ -31,9 +31,47 @@ The sections below describe the Claude skill unless a heading says Copilot Studi
 
 ## Sample output
 
+Lab data, names blurred. The same screenshots with notes on each tab are in [claude/README.md](claude/README.md).
+
+### Dashboard tab
+
 ![Dashboard tab](docs/screenshots/data-protect-health-dashboard-claude.png)
 
-Screenshots of every tab, with lab data and names blurred, are in [claude/README.md](claude/README.md).
+### Alerts tab
+
+![Alerts tab](docs/screenshots/alerts-claude.png)
+
+### SLA & Strikes tab
+
+![SLA & Strikes tab](docs/screenshots/sla-and-strikes-claude.png)
+
+### Running & Duration tab
+
+![Running & Duration tab](docs/screenshots/running-and-duration-claude.png)
+
+### Run Log tab
+
+![Run Log tab](docs/screenshots/run-log-claude.png)
+
+### Compliance Check tab
+
+![Compliance Check tab](docs/screenshots/compliance-check-claude.png)
+
+### Run Metrics tab
+
+![Run Metrics tab](docs/screenshots/run-metrics-claude.png)
+
+### Settings tab
+
+![Settings tab](docs/screenshots/settings-claude.png)
+
+### Audit trail pop-up
+
+![Audit trail pop-up](docs/screenshots/audit-trail-claude.png)
+
+### LLM usage disclaimer
+
+![LLM usage disclaimer](docs/screenshots/llm-usage-disclaimer-claude.png)
 
 ## What you get
 
