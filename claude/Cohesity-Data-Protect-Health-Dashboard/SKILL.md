@@ -42,12 +42,12 @@ Header with the Cohesity logo top-left (inline SVG, links to cohesity.com), eyeb
 - **Protection group and object names while the mask is on.** With the **Mask sensitive data** switch on (the default), every displayed protection group name and object name (VM, host, database, volume, view source) is shown as its first two letters plus `***` (a name shorter than 3 characters is shown as is plus `***`). This applies everywhere a name is displayed: tables, KPI sentences, the summary strip, What Changed lists, Needs Attention rows, chart labels and their accessible names (`title` and `aria-label`), expanded details, Compliance Check samples, the Run Log, "See also" text, the CSV copy and download, the PDF (it follows the DOM) and the copied support summary. With the mask off everything is shown in full. Cluster, policy, tenant and source-registration names are not masked by this rule (the IP, hostname, email and account masks still apply to them). Sorting, grouping, filtering and search keep working on the real names: search matches the real name (the help line under the search boxes says "Search matches the real names even while masked"), and the keys behind expand and collapse and the What Changed set differences are the real values. Masked names can collide (two groups both `Pr***`), so tables keep the cluster column and the What Changed lists show "Pr*** (cluster)". The page builds the list of names to hide from the data: `group` of `triage`, `nosuccess`, `sla`, `strikes`, `running`, `longest` and `runlog`, the group part of the `fail` and `sla` keys of `prev.sets`, and the optional `objs` list (see the data JSON shape); a name that equals a cluster name is left as it is. Names of 3 or more characters are also found inside longer text (error text, root-cause text, evidence) at word boundaries; a shorter name is masked only when it is a whole cell. The header privacy line reads: "IP addresses, hostnames, emails, SSNs, connection-string accounts, cloud account ids, ARNs and GUIDs are masked in this view and in CSV copies and downloads. Protection group and object names are shortened while the mask is on. Cluster and policy names are shown as they are. This is a display setting, not redaction." Keep the `mkN()` name mask, the cell-level `window.__maskName` call in the CSV helper and the `title` and `aria-label` handling of the mask script in every rebuild.
 - **Hand-typed figures footnote**: when `meter.manual` is not empty, Run Metrics and the end of the Dashboard say "Figures entered by hand from inline tool output (not machine-processed): <labels>."
 - **Audit trail pop-up** (Run Metrics, Run History card header; button "Audit trail", `aria-haspopup="dialog"`, minimum 44 px target): a `<dialog>` titled "Audit trail", subtitle "What the skill did on each run: every Helios call and the decisions around it. Read-only.", built from `audit` in the data JSON (see "Audit trail"). Filters on one wrapping row: Category (All, Run, Tool call, Data pull, Setting, Schedule, Pricing, Error, Publish), Status (All, OK, Failed, Partial, Timeout, Skipped, Info), Run (All runs, then each run by finish time, newest first), Search (event and detail, with a suggestion list) and Reset filters, and the live counter "Showing N of M events". The table (Time UTC sortable, Run, Category, Event, Status as a pill with a text cue, Seconds, Count, Detail) lists newest first in a scroll area of at most 60 vh with a sticky header, 200 rows at a time and a "Show 200 more" button; failed and timeout rows carry the red tone stripe and partial rows the amber one. Footer: Download CSV (respects the filters; the `downloads` capability; formula-injection guard; file `audit-trail-health-<date>.csv`) and Close; "Audit trail (all events)" is also in the Export list. Escape, the backdrop and Close close it, focus is trapped and returns to the button, and the page scroll is locked while it is open. While the mask is on, the Event and Detail text, tooltips, the CSV and the search suggestions go through the page mask (search matches the real values). Runs before this version have no `audit`: the page then derives one Tool call row per call of `meter.tools` for the stored run and says "Runs before this version have no audit trail." The pop-up is not part of the PDF.
-- **Pricing source card** (Run Metrics, under the Estimated cost tiles): the explanation "Where the skill looks up the price per million input tokens. Default is Anthropic's public pricing page. If your company has a negotiated rate, link a page or file that lists it.", a link field prefilled with `https://platform.claude.com/docs/en/about-claude/pricing`, an **Open** link (`target="_blank" rel="noopener noreferrer"`), **Save** and **Reset to default** buttons, a `role="status"` line ("Using default source", "Using custom source: <host>, saved <time> by <name>", "Saved. Used on the next run." or an error) and "Used by the last run: default, custom, earlier price or none" from `psrc` of the last history row. The saved value is the page-database document `settings/pricing` = `{"url":"https://...","savedAt":"<UTC ISO>","savedById":"<id>","savedByName":"<name or empty>"}`, written only by viewers who can edit the page (the `db` rule `write: "admin"`); other viewers and signed-out viewers see the field read-only with "Only people who can edit this page can change it." Reset writes the default URL (the document is kept; one rule). The link must start with `https://`, have no spaces and no `user:pass@`, and be at most 500 characters; `.xlsx`, `.xls`, `.csv` and normal pages are accepted. The page never fetches the URL itself; only the skill reads it, at run time.
+- **Pricing source card** (Run Metrics, under the Estimated cost tiles): the explanation "Where the skill looks up the price per million input tokens. Default is Anthropic's public pricing page. If your company has a negotiated rate, link a page or file that lists it.", a link field prefilled with `https://platform.claude.com/docs/en/about-claude/pricing`, an **Open** link (`target="_blank" rel="noopener noreferrer"`), **Save** and **Reset to default** buttons, a `role="status"` line ("Using default source", "Using custom source: <host>, saved <time> by <name>", "Saved. Used on the next run." or an error) and "Used by the last run: default, custom, earlier price or none" from `psrc` of the last history row. The saved value is the page-database document `settings/pricing` = `{"url":"https://...","savedAt":"<UTC ISO>","savedById":"<id>","savedByName":"<name or empty>"}`, written only by viewers who can edit the page (the `db` rule `write: "admin"`); other viewers and signed-out viewers see the field read-only with "Only people who can edit this page can change it." Reset writes the default URL (the document is kept; one rule). The link must start with `https://`, have no spaces and no `user:pass@`, and be at most 500 characters; `.xlsx`, `.xls`, `.csv` and normal pages are accepted. The page never fetches the URL itself; only the skill reads it, at run time. The card's markup, CSS and script are copied from Cohesity-Fleet-Health (label "Source link", one row with the link field, an **Open** button-style link, **Save** and **Reset to default**); do not restyle it. Run Metrics fonts and sizes follow Fleet Health: 14 px bold card headings, 12 px `.sub` text, 11 px `.foot` lines, normal-case 12 px table headers.
 - **Settings** (last tab): a table that shows how this page uses your data (tool group, what it does, where the data goes, tools used, enabled, last changed, used in last run) with one row for the data tools and one for the Cohesity AI agents, an On / Off switch for the Cohesity AI agents (Off by default; turning it On opens a consent popup), and a Details popup with the answers Cohesity Engineering has published about the data sent to its LLM (see "Settings and data handling"). The cluster filter is hidden on this tab.
 
 Alerts, SLA & Strikes, Running & Duration and Run Log use only data already collected for the Dashboard plus the alert call and the 7-day run rows (or strike look-back on the fallback path) described in the data steps. Each has its tool-name footers and its tables in the Export list.
 
-Run Metrics shows four tile groups under 12 px uppercase section labels (Last run, Last 24 hours, Month to date, Estimated cost; every group is a `.kpis` grid of `KPI.tile`s, the lone tile of a run-less page is "Status: Not tracked"), one closed "How to read this" under the Estimated cost tiles, a **Pricing source** card (see "Pricing source card"), a by-month table next to the last run's calls by tool, a **Tool Availability** card (every Helios tool the skill can use, with status, calls, the real reason and the page features that depend on it, and a closed "How to read this"), a **Helios Tool Calls (This Run)** card (calls, outcomes, retries, average and maximum seconds per tool, a closed "How to read this" and one line with the triage calls attempted, timed out and not attempted) and a **Run History** card (finished time, trigger, model, tool calls, time, estimated tokens, estimated cost, retries, errors and average seconds per call) with an **Audit trail** button in its header (see "Audit trail pop-up"), then one closing "How to read this" and the hand-typed figures note. The Month to date tile reads "1 to N of YYYY-MM (UTC), D days". See "Run metering".
+Run Metrics shows four tile groups under 12 px uppercase section labels (Last run, Last 24 hours, Month to date, Estimated cost; every group is a `.kpis` grid of `KPI.tile`s, the lone tile of a run-less page is "Status: Not tracked"), one closed "How to read this" under the Estimated cost tiles, a **Pricing source** card (see "Pricing source card"), a by-month table (the month cell "2026-11 (to date)" stays on one line) next to the last run's calls by tool, a **Tool Availability** card (every Helios tool the skill can use, with status, calls, the real reason and the page features that depend on it, and a closed "How to read this"), a **Helios Tool Calls (This Run)** card (calls, outcomes, retries, average and maximum seconds per tool, a closed "How to read this" and one line with the triage calls attempted, timed out and not attempted) and a **Run History** card (finished time, trigger, model, tool calls, time, estimated tokens, estimated cost, retries, errors and average seconds per call) with an **Audit trail** button in its header (see "Audit trail pop-up"), then one closing "How to read this" and the hand-typed figures note. The Month to date tile reads "1 to N of YYYY-MM (UTC), D days". See "Run metering".
 
 The Settings tab is the canonical Settings block (version 1.3, with the time zone control in the schedule card) shared by all Cohesity skills: paste it unchanged (the template marks it with `SETTINGS-BLOCK` BEGIN and END comments in the CSS, tab, pane, dialog and script parts) and edit only the `SETTINGS_CFG` line; never rewrite it per skill. Tab id `tabset`, pane `pane-set`. The **Settings** tab is a table (a real `<table>`; below 641 px each row becomes a stacked card with the column label before each value). Intro line: "How this page uses your data. Data tools read from your clusters. Cohesity AI agents are optional and send data to Cohesity's LLM subscription." Columns: Tool group, What it does, Where the data goes, Tools used, Enabled, Last changed, Used in last run. Row "Data tools": always on (a disabled, greyed switch with the tooltip "Always on: this page cannot work without data tools"), last changed "Not applicable". Row "Cohesity AI agents" (the name of this row everywhere; never "Troubleshooting analysis" or "Agentic tools"): the switch (Off by default), the text "Off by default. These agents send details of failed backups and alerts to Cohesity's LLM subscription.", last changed date ("Never changed" when there is none, as "<date> UTC by <name>" when the person is known, with the email only in a tooltip; the line "Accepted <time> by <name>" under it when on; name and email are masked while the mask switch is on), "Saved in this page's own storage, not in your browser." and a **Details** button. Clicking the switch while Off writes nothing: it opens the popup "How Cohesity handles data sent to its LLM" (the intro line "Below is how your data is handled by Cohesity when it is sent to Cohesity's own LLM subscription." and then only the answered items of `AGENT_DATA_FACTS`, question on the left and answer on the right, grouped under category sub-headers that have at least one answered item; no visible column headings, no preliminary note, no count line; "No details published yet." when none is answered) with a sticky footer: the sentence "By enabling, you agree that details of failed backups and alerts are sent to Cohesity's LLM subscription as described above." and the buttons "I accept and enable Cohesity AI agents" and "Cancel". Accept first confirms who the viewer is (see "Settings and data handling"); when the identity cannot be confirmed the Accept button is disabled with "Your identity could not be confirmed, so this setting cannot be enabled from here." and an ask-the-owner hint, and nothing is written. Otherwise Accept makes one database write and enables; Cancel, Esc or a click outside closes without a write. Turning Off is direct (no popup) and says "Takes effect on the next refresh". The Details button opens the same popup read-only (Close only). Without write access the switch is disabled with "Only editors of this page can change this setting". "Used in last run" is derived from `meter.avail`: "Yes, N calls", "No, turned off", "No, not licensed or not entitled", "No, not available", "Not run yet" or "Not used by this page". Below the table: "Changes take effect on the next refresh. This setting applies to this page only." With the agents off, the affected tabs show "Not shown: <labels>. Turned off in Settings. " followed by a link-styled button "Open the Settings tab" that switches to the Settings tab (no failure wording, no tail text), and the Run Metrics availability table shows those tools as "Turned off by you". **Live preference versus last run.** The Settings row reads the live database document; the availability table and the strips read the data of the last run (`meter.avail`), and the page compares the live value with `settings.troubleshooting` and the avail rows so it never contradicts itself. When the live preference is `on` and an agent row has `st` `off` (the agents were enabled after the last run), the chip reads "Off at last refresh" with the Why "Cohesity AI agents were turned off when this page was last refreshed; they are on now and will be used on the next refresh.", the tab strips read "Not shown: <labels>. Cohesity AI agents were off at the last refresh and are on now. They will be used on the next refresh." (no Settings link), the "Used in last run" cell reads "No, off at last refresh", and a small hint next to the existing Refresh from Helios button says "Cohesity AI agents are on now. Refresh from Helios to use them." (no new button). When the live preference is `off` but the last run used the tools (`n` above 0), the table shows them as run, the strips add "Cohesity AI agents are now off; this page still shows results from the last refresh." and the hint says "Cohesity AI agents are off now. Refresh from Helios to update this page." When the database cannot be read, the page shows the data of the last run with the existing wording.
 
@@ -516,18 +516,21 @@ a.set-btn{text-decoration:none;box-sizing:border-box;text-align:center}
 .chd{display:flex;justify-content:space-between;align-items:center;gap:8px 12px;flex-wrap:wrap;margin:0 0 12px}
 .chd h2{margin:0}
 .abtn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:6px 12px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;font:inherit;font-size:12px;line-height:1.3;text-decoration:none;cursor:pointer}
-@media(max-width:600px){.abtn{min-height:44px}}
 #aud-dlg .abtn{min-height:44px;min-width:44px}
-.abtn:hover:not(:disabled):not([aria-disabled="true"]){background:var(--hover)}
-.abtn:disabled{opacity:.5;cursor:not-allowed}
-.abtn:focus-visible,#aud-dlg select:focus-visible,#aud-dlg input:focus-visible,.aud-tw:focus-visible,#prc input:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.abtn:hover:not(:disabled){background:var(--hover)}
+.abtn:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+#aud-dlg select:focus-visible,#aud-dlg input:focus-visible,.aud-tw:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.abtn:disabled{opacity:.55;cursor:not-allowed}
+.abtn.pri{background:var(--green);color:var(--bg);border-color:var(--green);font-weight:700}
+a.abtn:visited{color:var(--text)}a.abtn.off{opacity:.55;pointer-events:none}
 .prc .fbar{align-items:flex-end;margin:8px 0}
-.prc .fbar label{flex:1 1 320px;min-width:0;font-weight:400}
-.prc .fbar input{width:100%;min-height:36px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font:inherit;font-size:12px}
+.prc .fbar label{flex:1 1 320px;min-width:0}
+.prc .fbar input{width:100%;min-height:36px}
 .prc .abtn:disabled{opacity:.55;cursor:not-allowed}
 .prc input[readonly]{opacity:.8}
 .prc p.sub{margin:4px 0 0;line-height:1.5;overflow-wrap:anywhere}
-@media(max-width:600px){.prc .abtn{min-height:44px}.prc .fbar .abtn{flex:1 1 auto}}
+.prc p.sub.bad{font-weight:700;color:var(--red)}
+@media(max-width:600px){.abtn{min-height:44px}.prc .fbar .abtn{flex:1 1 auto}}
 html.aud-lock,html.aud-lock body{overflow:hidden}
 #aud-dlg.adlg{padding:0;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);width:calc(100% - 24px);max-width:1100px;max-height:calc(100% - 24px);margin:auto;font-family:Arial,Helvetica,sans-serif}
 #aud-dlg.adlg[open]{display:flex;flex-direction:column}
@@ -583,7 +586,7 @@ details.ms>summary:focus-visible,.menu button:focus-visible,.menu input:focus-vi
 @media(max-width:900px){.g4,.g3,.g2{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.g4,.g3,.g2{grid-template-columns:minmax(0,1fr)}}
 .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;min-width:0}
-.card h2{margin:0 0 12px;font-size:14px}
+.card h2{margin:0 0 12px;font-size:14px;font-weight:700}
 .sub{font-size:12px;color:var(--muted)}
 .tool{margin-top:10px;font:11px "Courier New",monospace;color:var(--muted);border-top:1px solid var(--rule);padding-top:8px}
 .red{color:var(--red)}.amber{color:var(--amber)}
@@ -816,11 +819,14 @@ button,input,select,textarea{font-family:inherit}
 .k4 .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(min-width:760px){.k4 .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
 #pane-meter>details.how{margin:0 0 16px}
-#pane-meter .foot{font-size:12px}
 #pane-meter .sec{font-weight:600}
 #pane-meter .card details.how{margin:6px 0 0}
-#pane-meter td.mo{white-space:nowrap;min-width:110px}
-#pane-meter tr.tot td{font-weight:700}
+#pane-meter th{white-space:nowrap}
+#mbm td:first-child{white-space:nowrap;min-width:116px}
+#avs{margin:0 0 8px;line-height:1.5}
+.full{margin-bottom:16px}
+tr.tot td{font-weight:700}
+td.gn{font-weight:600;overflow-wrap:anywhere}
 @media(max-width:600px){#pane-meter details.how>summary{min-height:44px;padding:12px 2px}}
 .kit.stat>.kpis{margin:0}
 .avk{margin:0}.avk[hidden]{display:none}
@@ -1040,12 +1046,12 @@ follow();
 <h3 class="sec">Last 24 hours</h3><div class="kit k4 stat" id="md"></div>
 <h3 class="sec" id="mmh">Month to date</h3><div class="kit k4 stat" id="mm"></div>
 <h3 class="sec">Estimated cost</h3><div class="kit k4 stat" id="cc"></div><details class="how"><summary>How to read this</summary><div class="foot" id="cn"></div></details>
-<div class="card triage prc" id="prc"><h2>Pricing source</h2>
+<div class="card full prc" id="prc"><h2>Pricing source</h2>
 <p class="sub" id="prc-d">Where the skill looks up the price per million input tokens. Default is Anthropic's public pricing page. If your company has a negotiated rate, link a page or file that lists it.</p>
-<div class="fbar"><label for="prc-u">Source link<input id="prc-u" type="text" inputmode="url" autocomplete="off" spellcheck="false" value="https://platform.claude.com/docs/en/about-claude/pricing" aria-describedby="prc-h prc-st"></label><a class="abtn" id="prc-o" href="https://platform.claude.com/docs/en/about-claude/pricing" target="_blank" rel="noopener noreferrer">Open</a><button type="button" class="abtn" id="prc-s" disabled>Save</button><button type="button" class="abtn" id="prc-r" disabled>Reset to default</button></div>
+<div class="fbar"><label for="prc-u">Source link<input id="prc-u" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" value="https://platform.claude.com/docs/en/about-claude/pricing" aria-describedby="prc-h prc-st"></label><a class="abtn" id="prc-o" href="https://platform.claude.com/docs/en/about-claude/pricing" target="_blank" rel="noopener noreferrer">Open</a><button type="button" class="abtn" id="prc-s" disabled>Save</button><button type="button" class="abtn" id="prc-r" disabled>Reset to default</button></div>
 <p class="sub" id="prc-h">The skill reads the file or page when it runs. Keep it to a table of model names and USD per million input tokens. Links to .xlsx, .xls and .csv files and to normal pages work.</p>
 <p class="sub" id="prc-ro" hidden>Only people who can edit this page can change it.</p>
-<p class="sub" id="prc-st" role="status">Using default source</p>
+<p class="sub" id="prc-st" role="status" aria-live="polite">Using default source</p>
 <p class="sub" id="prc-l">Used by the last run: not recorded</p></div>
 <div class="grid g2">
 <div class="card"><h2>By Month</h2><div class="tw sc"><table><thead><tr><th>Month (UTC)</th><th>Runs</th><th>Tool calls</th><th>Time</th><th>Est. tokens</th><th>Est. cost</th></tr></thead><tbody id="mbm"></tbody></table></div></div>
@@ -2135,7 +2141,7 @@ function meter(){
  cards('cc',[['Last run',money(cL),(L.model||'model not recorded')+(price(L)!==null?' at $'+price(L)+' per million tokens'+(L.psrc==='custom'?' (custom source)':''):'')],['Last 24 hours',known?money(cD):'n/a','sum of runs in the window'],['Month to date',known?money(cM):'n/a','recorded runs since the 1st'],['Projected for the month',known?money(cM+(SC&&SC.perDay>0?(cM/Math.max(1,H.filter(function(x){return x.t.slice(0,7)===mk}).length))*SC.perDay*(dim-day):0)):'n/a',SC&&SC.perDay>0?'month to date plus '+Math.round(SC.perDay*(dim-day))+' more runs ('+(SC.label||SC.perDay+' per day')+')':'no schedule found, so no further runs are projected']]);
  $('cn').textContent='Cost = estimated tokens of tool output the model read x the price per million input tokens of the model that ran. The projection adds the average cost per run times the runs left in the month on the schedule found when the run started; with no schedule it adds nothing. Prices were read at run time from the pricing source below (the Anthropic pricing page unless a custom source is saved) and are stored with each run. It does not include output tokens, caching discounts or the conversation the model re-reads at each step; Settings > Usage shows measured cost.';
  var by={};H.forEach(function(x){var k=x.t.slice(0,7);(by[k]=by[k]||[]).push(x)});
- var bm=$('mbm');bm.textContent='';Object.keys(by).sort().reverse().forEach(function(k){var r=sum(by[k]),tr=el('tr');tr.appendChild(el('td','mo',k+(k===mk?' (to date)':'')));var ck=true,cs=0;by[k].forEach(function(x){var c=cost(x);if(c===null)ck=false;else cs+=c});[String(r.runs),fmt(r.calls),dur(r.sec),tok(r.tok),ck?money(cs):'n/a'].forEach(function(v){tr.appendChild(el('td','num',v))});bm.appendChild(tr)});
+ var bm=$('mbm');bm.textContent='';Object.keys(by).sort().reverse().forEach(function(k){var r=sum(by[k]),tr=el('tr');tr.appendChild(el('td','',k+(k===mk?' (to date)':'')));var ck=true,cs=0;by[k].forEach(function(x){var c=cost(x);if(c===null)ck=false;else cs+=c});[String(r.runs),fmt(r.calls),dur(r.sec),tok(r.tok),ck?money(cs):'n/a'].forEach(function(v){tr.appendChild(el('td','num',v))});bm.appendChild(tr)});
  var mh=$('mh');mh.textContent='';H.slice().reverse().forEach(function(x){var tr=el('tr');tr.appendChild(el('td','num',x.t.replace('T',' ').replace('Z','')));tr.appendChild(el('td','',x.src||''));tr.appendChild(el('td','',x.model||'not recorded'));[fmt(x.calls),dur(x.sec),tok(x.tok),money(cost(x)),x.ret===undefined?'n/a':String(x.ret),x.err===undefined?'n/a':String(x.err),x.avgS==null?'n/a':String(x.avgS)].forEach(function(v){tr.appendChild(el('td','num',v))});mh.appendChild(tr)});
  $('mhf').textContent=H.length+' run'+(H.length>1?'s':'')+' recorded, newest first. Every run is kept.';
  var mt=$('mt');mt.textContent='';if(M){var b=M.byTool||{};Object.keys(b).sort(function(p,q){return b[q]-b[p]}).forEach(function(k){var r=el('tr');r.appendChild(el('td','',k));r.appendChild(el('td','num',String(b[k])));mt.appendChild(r)});
@@ -2146,7 +2152,7 @@ function meterTools(){var M=D.meter||{},T=Array.isArray(M.tools)?M.tools:null,ts
  if(!T){var e=el('tr'),d=el('td','empty','n/a: per-call timings were not recorded in this run.');d.colSpan=10;e.appendChild(d);tb.appendChild(e);cp.textContent=''}
  else{var by={},all={n:0,ok:0,pa:0,fa:0,to:0,ne:0,re:0,s:[]};
   T.forEach(function(x){var b=by[x.t]=by[x.t]||{n:0,ok:0,pa:0,fa:0,to:0,ne:0,re:0,s:[]};[b,all].forEach(function(z){z.n++;if(x.o==='partial')z.pa++;else if(x.o==='failed')z.fa++;else if(x.o==='timeout')z.to++;else if(x.o==='not_entitled')z.ne++;else z.ok++;if(x.r)z.re++;if(typeof x.s==='number')z.s.push(x.s)})});
-  function row(name,b,strong){var r=el('tr');r.appendChild(el('td','',name));[b.n,b.ok,b.pa,b.fa,b.to,b.ne,b.re].forEach(function(v){r.appendChild(el('td','num',String(v)))});var sum=0;b.s.forEach(function(v){sum+=v});r.appendChild(el('td','num',b.s.length?f1(sum/b.s.length):'n/a'));r.appendChild(el('td','num',b.s.length?f1(Math.max.apply(null,b.s)):'n/a'));if(strong){r.style.fontWeight='700';r.className='tot'}tb.appendChild(r)}
+  function row(name,b,strong){var r=el('tr');r.appendChild(el('td',strong?'':'gn',name));[b.n,b.ok,b.pa,b.fa,b.to,b.ne,b.re].forEach(function(v){r.appendChild(el('td','num',String(v)))});var sum=0;b.s.forEach(function(v){sum+=v});r.appendChild(el('td','num',b.s.length?f1(sum/b.s.length):'n/a'));r.appendChild(el('td','num',b.s.length?f1(Math.max.apply(null,b.s)):'n/a'));if(strong)r.className='tot';tb.appendChild(r)}
   Object.keys(by).sort(function(p,q){return by[q].n-by[p].n||(p<q?-1:1)}).forEach(function(k){row(k,by[k])});row('All tools',all,true);
   cp.textContent='Seconds are the wall-clock time of the batch the call ran in (the system clock read before and after each batch). Calls that ran in parallel share the batch time, so the figures do not add up to the elapsed time. OK includes valid empty results. '+all.n+' call row'+(all.n===1?'':'s')+' recorded'+(M.calls!==undefined&&M.calls!==all.n?' of '+M.calls+' counted':'')+(T.length>=400?' (capped at 400)':'')+'.'}
  var ta=T?T.filter(function(x){return /triage/.test(x.t)}):null,sk=ts&&typeof ts.skipped==='number'?ts.skipped:null;
@@ -2155,7 +2161,7 @@ function meterAvail(){var tb=$('avt'),sm=$('avs');tb.textContent='';
  if(!AV){sm.textContent='Not recorded for this run.';var e=el('tr'),d=el('td','empty','Not recorded for this run.');d.colSpan=5;e.appendChild(d);tb.appendChild(e);return}
  var rows=avRows(),bad=rows.filter(function(r){return r.st!=='ok'&&r.st!=='partial'&&r.st!=='unchecked'&&r.st!=='off'}),nc=rows.filter(function(r){return r.st==='unchecked'}).length,offc=rows.filter(function(r){return r.st==='off'}).length,ok=rows.length-bad.length-nc-offc;
  sm.textContent=ok+' of '+rows.length+' tools available; '+bad.length+' unavailable'+(bad.length?' ('+bad.map(function(r){return r.t}).join(', ')+')':'')+(nc?'; '+nc+' not checked':'')+(offc?'; '+offc+(avLive()==='on'?' off at the last refresh (on now)':' turned off by you in Settings'):'')+(bad.length?'; this page shows n/a for the parts that depend on them.':'.');
- rows.forEach(function(r){var tr=el('tr'),th=el('th','',r.t);th.scope='row';th.style.fontWeight='400';th.style.textAlign='left';tr.appendChild(th);
+ rows.forEach(function(r){var tr=el('tr');tr.appendChild(el('td','gn',r.t));
   var s=el('td'),good=r.st==='ok',cls=good?'ok':r.st==='off'?'':(r.st==='partial'||r.st==='skipped'||r.st==='unchecked')?'amb':'hot',icon=AVI[r.st]||'✕';s.appendChild(chip(icon+' '+avStatus(r),cls));tr.appendChild(s);
   tr.appendChild(el('td','num',typeof r.n==='number'?String(r.n):'n/a'));tr.appendChild(el('td','msg',avWhy(r)||(good||r.st==='unchecked'?'':'n/a')));tr.appendChild(el('td','msg',avAffects(r)||'-'));tb.appendChild(tr)})}
 meterTools();meterAvail();['d','al','sl','rd','rl'].forEach(avStrip);avHint();tsNote();foldAll();
@@ -2300,61 +2306,64 @@ var AUD;try{AUD=(function(){
  var mkc=$('mk');if(mkc)mkc.addEventListener('change',function(){if(isOpen())render()});
  window.__audRows=function(){load();return csvRows(ROWS.slice().sort(function(a,b){var c=a.t<b.t?-1:a.t>b.t?1:a.i-b.i;return -c}))};
  return {open:open,close:close}})()}catch(e){AUD=null}
-var PRC;try{PRC=(function(){
- var DEF='https://platform.claude.com/docs/en/about-claude/pricing',MAXL=500,inp=$('prc-u'),sv=$('prc-s'),rs=$('prc-r'),op=$('prc-o'),st=$('prc-st'),ro=$('prc-ro'),ls=$('prc-l');
- if(!inp||!sv||!rs||!op||!st)return null;
- var S={saved:null,db:null,u:null,ready:false,can:false,dirty:false,msg:'',err:'',busy:false};
- function check(v){v=String(v==null?'':v).trim();if(!v)return 'Enter a link that starts with https://.';
-  if(v.length>MAXL)return 'The link is longer than '+MAXL+' characters.';
-  if(/\s/.test(v))return 'The link must not contain spaces.';
-  if(!/^https:\/\//i.test(v))return 'The link must start with https://.';
-  if(/^https:\/\/[^\/?#]*@/i.test(v))return 'The link must not contain a user name or password.';
-  var u;try{u=new URL(v)}catch(e){return 'That is not a valid link.'}
-  if(u.username||u.password)return 'The link must not contain a user name or password.';
-  if(!u.hostname)return 'That is not a valid link.';return ''}
- function eff(){var s=S.saved;return s&&typeof s.url==='string'&&!check(s.url)?s.url.trim():DEF}
- function M(s){s=s==null?'':String(s);try{return window.__mask?window.__mask(s):s}catch(e){return ''}}
+/* PRICING-SOURCE: editable source for the price per million input tokens (Run Metrics). The page only stores the link in settings/pricing; it never fetches it. The skill reads it each run. */
+var PRC=null;try{PRC=(function(){
+ var DEF='https://platform.claude.com/docs/en/about-claude/pricing',card=$('prc');if(!card)return null;
+ var inp=$('prc-u'),sv=$('prc-s'),rs=$('prc-r'),op=$('prc-o'),st=$('prc-st'),ro=$('prc-ro'),la=$('prc-l');
+ var S={db:null,pend:true,doc:null,edit:null,signed:null,busy:false,msg:'',bad:false,dirty:false};
+ function chk(v){var t=String(v==null?'':v).trim();
+  if(!t)return 'Enter a link that starts with https://.';
+  if(t.length>500)return 'Use at most 500 characters.';
+  if(/\s/.test(t))return 'The link cannot contain spaces.';
+  if(!/^https:\/\//i.test(t))return 'The link must start with https://.';
+  var u;try{u=new URL(t)}catch(e){return 'This is not a valid link.'}
+  if(u.protocol!=='https:'||!u.hostname)return 'This is not a valid link.';
+  if(u.username||u.password||/^https:\/\/[^\/?#]*@/i.test(t))return 'Remove the user name and password from the link.';
+  return ''}
+ function snapDoc(s){try{if(!s)return null;if(typeof s.exists==='function'&&!s.exists())return null;if(typeof s.exists==='boolean'&&!s.exists)return null;
+  var d=typeof s.data==='function'?s.data():(s.data!==undefined?s.data:s);if(!d||typeof d!=='object'||typeof d.url!=='string'||chk(d.url))return null;
+  return{url:d.url.trim(),savedAt:typeof d.savedAt==='string'?d.savedAt:'',savedById:typeof d.savedById==='string'?d.savedById:'',savedByName:typeof d.savedByName==='string'?d.savedByName:''}}catch(e){return null}}
+ function eff(){return S.doc?S.doc.url:DEF}
+ function msk(s){s=s==null?'':String(s);try{return window.__mask?window.__mask(s):s}catch(e){return s}}
+ function nm(n){n=String(n||'').trim();if(!n)return '';var on=true;try{on=window.__maskOn?!!window.__maskOn():true}catch(e){}return on?n.split(/\s+/).map(function(w){return w.charAt(0)+'*'.repeat(Math.max(w.length-1,0))}).join(' '):n}
  function host(u){try{return new URL(u).hostname}catch(e){return ''}}
- function when(t){var m=/^(\d{4}-\d\d-\d\d)T(\d\d:\d\d)/.exec(String(t||''));return m?m[1]+' '+m[2]+' UTC':''}
- function nm(n){n=String(n||'').trim();if(!n)return '';if(window.__maskOn&&window.__maskOn())return n.split(/\s+/).map(function(w){return w.charAt(0)+'***'}).join(' ');return n}
- function status(){if(S.err)return S.err;if(S.msg)return S.msg;var e=check(inp.value);if(S.dirty&&e)return e;var u=eff();if(u===DEF)return 'Using default source';
-  var s0=S.saved||{},w=when(s0.savedAt),n=nm(s0.savedByName);return 'Using custom source: '+M(host(u))+(w?', saved '+w:'')+(n?' by '+n:'')}
- function last(){var H=(Array.isArray(D.meterHistory)?D.meterHistory:[]).slice().sort(function(x,y){return x.t<y.t?-1:1}),L=H.length?H[H.length-1]:null;
-  if(!L)return 'Used by the last run: no run recorded.';
-  var m={'default':'default',custom:'custom','carried':'earlier price','none':'none'}[L.psrc];
-  if(!m)return 'Used by the last run: not recorded (the run was before this version).';
-  return 'Used by the last run: '+m+(L.psrc==='custom'&&L.phost?' ('+M(L.phost)+')':'')+'.'}
- function ed(){return !!(S.ready&&S.u&&S.can&&S.db)}
- function render(){var e=ed();inp.readOnly=!e;if(!S.dirty&&document.activeElement!==inp)inp.value=eff();
-  var v=check(inp.value),same=inp.value.trim()===eff();
-  sv.disabled=!e||S.busy||!!v||same;rs.disabled=!e||S.busy||(eff()===DEF&&inp.value.trim()===DEF);
-  op.setAttribute('href',eff());if(ro)ro.hidden=!S.ready||e;
-  st.textContent=status();if(ls)ls.textContent=last()}
- function perm(x){var m=x&&(x.code||x.status||x.message||x);return /permission|denied|forbidden|unauthor|403|401|admin/i.test(String(m))}
- function who(){var u=S.u;if(!u||typeof u.id!=='function')return Promise.resolve(null);
-  return Promise.resolve().then(function(){return u.id()}).then(function(id){id=typeof id==='string'?id.trim():'';if(!id)return null;
-   var name='';return Promise.resolve().then(function(){return typeof u.me==='function'?u.me():null}).then(function(m){if(m&&typeof m==='object')name=String(m.name||m.displayName||m.fullName||'').trim()},function(){}).then(function(){return{id:id,name:name}})}).then(function(w){return w},function(){return null})}
- function save(url){if(!ed()||S.busy)return;S.busy=true;S.err='';S.msg='Saving.';render();
-  who().then(function(w){
-   if(!w){S.busy=false;S.msg='';S.err='Not saved: could not identify you. Sign in and try again.';render();return}
-   var o={url:url,savedAt:new Date().toISOString().replace(/\.\d+Z$/,'Z'),savedById:w.id,savedByName:w.name};
-   var p;try{p=S.db.doc('settings/pricing').set(o)}catch(x){p=Promise.reject(x)}
-   Promise.resolve(p).then(function(){S.busy=false;S.saved=o;S.dirty=false;S.err='';S.msg='Saved. Used on the next run.';inp.value=url;render()},
-    function(x){S.busy=false;S.msg='';S.err=perm(x)?'Not saved: only people who can edit this page can change it.':'Could not save. Nothing was changed. Try again later.';render()})})}
- inp.addEventListener('input',function(){S.msg='';S.err='';S.dirty=inp.value.trim()!==eff();render()});
- sv.addEventListener('click',function(){var u=inp.value.trim();if(check(u))return;save(u)});
- rs.addEventListener('click',function(){S.msg='';S.err='';if(eff()!==DEF){save(DEF);return}S.dirty=false;inp.value=DEF;render()});
- var mkb=$('mk');if(mkb)mkb.addEventListener('change',function(){render()});
- render();
- (async function(){try{var cl0=window.claude;if(!cl0||typeof cl0.use!=='function'){S.ready=true;render();return}
-  var u=null;try{u=await cl0.use('user')}catch(e){u=null}
-  S.u=u&&typeof u==='object'?u:null;if(S.u){try{S.can=typeof S.u.canEdit==='function'?S.u.canEdit()!==false:false}catch(e){S.can=false}}
-  var db=null;try{db=await cl0.use('db')}catch(e){db=null}
-  if(db&&typeof db.doc==='function'){S.db=db;
-   try{db.doc('settings/pricing').onSnapshot(function(s){var d=null;try{if(s&&(typeof s.exists==='function'?s.exists():s.exists!==false)){d=typeof s.data==='function'?s.data():s.data}}catch(e){d=null}
-     S.saved=d&&typeof d==='object'?d:null;if(/read the saved/.test(S.err))S.err='';render()},function(){S.err='Could not read the saved source. The default source is shown.';render()})}catch(e){}}
-  S.ready=true;render()}catch(e){S.ready=true;try{render()}catch(x){}}})();
- return{chk:check,check:check,render:render}})()}catch(e){PRC=null}
+ function when(a){var m=/^(\d{4}-\d\d-\d\d)[T ](\d\d:\d\d)/.exec(String(a||''));return m?m[1]+' '+m[2]+' UTC':''}
+ function can(){return !!S.db&&S.signed===true&&S.edit!==false}
+ function lastRow(){var H=(D.meterHistory||[]).slice().sort(function(x,y){return x.t<y.t?-1:1});return H.length?H[H.length-1]:null}
+ function lastTxt(){var r=lastRow(),p=r&&typeof r.psrc==='string'?r.psrc:'';
+  var w=p==='default'?'default':p==='custom'?'custom'+(typeof r.phost==='string'&&r.phost?' ('+msk(r.phost)+')':''):p==='carried'?'earlier price':p==='none'?'none':'not recorded';return 'Used by the last run: '+w}
+ function paint(){var e=eff(),v=inp.value,t=v.trim(),err=chk(v),ok=can(),base;
+  if(!S.dirty&&v!==e)inp.value=v=e;
+  inp.readOnly=!ok||S.busy;
+  if(S.doc&&e!==DEF){base='Using custom source: '+msk(host(e))+(S.doc.savedAt?', saved '+when(S.doc.savedAt):'')+(S.doc.savedByName?' by '+nm(S.doc.savedByName):'')}else base='Using default source';
+  var msg=S.msg,bad=S.bad;if(!msg&&S.dirty&&err){msg=err;bad=true}
+  st.textContent=msg||base;st.className='sub'+(msg&&bad?' bad':'');
+  sv.disabled=!ok||S.busy||!!err||t===e;rs.disabled=!ok||S.busy||(e===DEF&&t===DEF);
+  var okOpen=!chk(e);if(okOpen){op.setAttribute('href',e);op.classList.remove('off');op.removeAttribute('aria-disabled')}else{op.removeAttribute('href');op.classList.add('off');op.setAttribute('aria-disabled','true')}
+  op.setAttribute('aria-label','Open the pricing source in a new tab');
+  var note='';if(S.pend||S.signed===null)note='Checking whether you can edit this page.';else if(!S.db)note='Saving needs the page database, which is not available in this view.';else if(!ok)note='Only people who can edit this page can change it.';
+  ro.textContent=note;ro.hidden=!note;la.textContent=lastTxt()}
+ function who(){return Promise.resolve().then(function(){var cl=window.claude;return cl&&typeof cl.use==='function'?cl.use('user'):null}).then(function(u){if(!u||typeof u.id!=='function')return null;
+  return Promise.resolve(u.id()).then(function(id){id=typeof id==='string'?id.trim():'';if(!id)return null;
+   return Promise.resolve(typeof u.me==='function'?u.me():null).then(function(me){me=me&&typeof me==='object'?me:{};var n=me.name||me.displayName||me.fullName||'';return{id:id,name:typeof n==='string'?n.trim().slice(0,120):''}},function(){return{id:id,name:''}})})}).then(function(w){return w},function(){return null})}
+ function permErr(e){return /not_granted|not_writer|permission|denied|forbidden|unauthori/i.test(String((e&&(e.code||''))+' '+(e&&e.message||'')))}
+ function write(url){if(!can()||S.busy)return;var err=chk(url);if(err){S.msg=err;S.bad=true;paint();return}
+  S.busy=true;S.msg='Saving.';S.bad=false;paint();
+  who().then(function(w){if(!w){S.busy=false;S.msg='Your identity could not be confirmed, so this cannot be saved from here.';S.bad=true;paint();return}
+   var o={url:url.trim(),savedAt:new Date().toISOString().replace(/\.\d+Z$/,'Z'),savedById:w.id,savedByName:w.name||''},p;
+   try{p=S.db.doc('settings/pricing').set(o)}catch(e){p=Promise.reject(e)}
+   Promise.resolve(p).then(function(){S.doc=snapDoc(o);S.busy=false;S.dirty=false;S.msg='Saved. Used on the next run.';S.bad=false;inp.value=o.url;paint()},
+    function(er){S.busy=false;S.bad=true;if(permErr(er)){S.edit=false;S.msg='Could not save: only people who can edit this page can change it.'}else S.msg='Could not save. Try again.';paint()})})}
+ inp.addEventListener('input',function(){S.dirty=inp.value.trim()!==eff();S.msg='';S.bad=false;paint()});
+ inp.addEventListener('keydown',function(ev){if(ev.key==='Enter'&&!sv.disabled){ev.preventDefault();write(inp.value)}});
+ sv.addEventListener('click',function(){write(inp.value)});
+ rs.addEventListener('click',function(){inp.value=DEF;S.dirty=false;write(DEF)});
+ var mkc=$('mk');if(mkc)mkc.addEventListener('change',function(){paint()});
+ (function(){var cl=window.claude;if(!cl||typeof cl.use!=='function'){S.pend=false;S.signed=false;S.edit=false;paint();return}
+  Promise.resolve().then(function(){return cl.use('user')}).then(function(u){return u&&typeof u==='object'?u:null},function(){return null}).then(function(u){var ce=null;if(u&&typeof u.canEdit==='function'){try{ce=u.canEdit()!==false}catch(e){ce=null}}S.signed=!!u;S.edit=u?(ce===null?true:ce):false;paint()});
+  Promise.resolve().then(function(){return cl.use('db')}).then(function(db){S.pend=false;if(db&&typeof db.doc==='function'){S.db=db;try{db.doc('settings/pricing').onSnapshot(function(s){S.doc=snapDoc(s);paint()},function(){S.msg='Could not read the saved source. Showing the default.';S.bad=true;paint()})}catch(e){}}paint()},function(){S.pend=false;paint()})})();
+ paint();
+ return{paint:paint,chk:chk,state:S}})()}catch(e){PRC=null}
 var XPAGE='health';
 var XS=[
  {id:'alerts-by-cluster',label:'Alerts: open alerts by cluster and severity',rows:function(){return [['cluster','critical','warning','info','anomaly_security','capped_lower_bound','not_registered']].concat(((D.alerts2||{}).clusters||[]).filter(function(c){return c.unreg||sel[c.name]}).map(function(c){return [c.name,c.critical||0,c.warning||0,c.info||0,c.anom||0,(D.alerts2||{}).capped?'yes':'no',c.unreg?'yes':'no']}))}},
