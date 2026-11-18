@@ -43,7 +43,7 @@ One row per active protection group with its last run.
 - Masking now also covers 12-digit cloud account ids, AWS ARNs and Azure subscription or tenant GUIDs, and the Compliance Check lists them as Low (Sensitive).
 - **Names while the mask is on.** Protection group and object names are shown as their first two letters plus `***` everywhere (tables, lists, tooltips, `aria-label`, CSV, PDF, copied summaries); search, sorting and the What Changed comparison keep using the real names, and cluster and policy names stay readable. The skill may list object names that appear inside the text it writes in `objs`.
 - **Time zone in the schedule card.** The Settings schedule card has a Time zone select (default: your zone). The request saves `tz`; the skill converts the time to the computer's local zone with python3 `zoneinfo`, shifts the weekday set when the conversion crosses midnight and records the machine zone as `meter.schedule.tz`. Daylight saving changes can shift the local run time by one hour.
-- The Settings tab is the shared canonical block v1.3 (tab id `tabset`). None of this adds Helios calls.
+- The Settings tab is the shared canonical block v1.4 (tab id `tabset`). None of this adds Helios calls.
 - **One-click links.** **Refresh from Helios** (page header) and **Apply in Claude** (Settings, Refresh schedule card) open a new Claude chat with the command typed in; press Enter there. They need the Cohesity-Data-Protect-Health-Dashboard skill (Refresh also the Helios connector) in your own Claude, and are disabled for viewers who are not signed in to Claude (Copy command still works). Apply runs the skill in schedule-only mode: no Helios call, it applies the saved schedule request and changes only the schedule on the page.
 
 ## Settings
